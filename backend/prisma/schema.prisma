@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  TEACHER
+  COORDINATOR
+  ADMIN
+}
+
+enum ReservationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+model User {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  name         String
+  passwordHash String
+  role         Role          @default(STUDENT)
+  createdAt    DateTime      @default(now())
+  reservations Reservation[]
+}
+
+model Building {
+  id    String @id @default(uuid())
+  name  String @unique
+  rooms Room[]
+}
+
+model Room {
+  id           String        @id @default(uuid())
+  name         String
+  capacity     Int
+  active       Boolean       @default(true)
+  buildingId   String
+  building     Building      @relation(fields: [buildingId], references: [id])
+  reservations Reservation[]
+
+  @@unique([buildingId, name])
+}
+
+model Reservation {
+  id        String            @id @default(uuid())
+  roomId    String
+  userId    String
+  startsAt  DateTime
+  endsAt    DateTime
+  status    ReservationStatus @default(PENDING)
+  reason    String?
+  createdAt DateTime          @default(now())
+  room      Room              @relation(fields: [roomId], references: [id])
+  user      User              @relation(fields: [userId], references: [id])
+
+  @@index([roomId, startsAt])
+}
