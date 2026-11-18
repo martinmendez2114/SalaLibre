@@ -5,6 +5,9 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "types": ["node"],
     "outDir": "dist",
     "rootDir": "src"
   },
